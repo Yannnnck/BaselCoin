@@ -6,6 +6,8 @@ using MongoDB.Driver;
 using System.Threading.Tasks;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Concurrent;
 
 [Route("api/auth")]
 [ApiController]
@@ -22,11 +24,19 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = await _users.Find(u => u.Username == request.Username).FirstOrDefaultAsync();
+        string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
-        if (user == null || !PasswordHelper.VerifyPassword(request.Password, user.HashedPassword))
+        if (RateLimiter.IsBlocked(ip))
+            return StatusCode(429, new { message = "Zu viele fehlgeschlagene Versuche. Bitte in 15 Minuten erneut versuchen." });
+
+        var user = await _users.Find(u => u.Username == request.Username).FirstOrDefaultAsync();
+        bool success = user != null && PasswordHelper.VerifyPassword(request.Password, user.HashedPassword);
+
+        RateLimiter.RegisterAttempt(ip, success);
+
+        if (!success)
         {
-            Logger.Log(request.Username, "Fehlgeschlagener Login-Versuch", "WARNUNG");
+            Logger.Log(ip, $"Fehlgeschlagener Login für {request.Username}", "WARNUNG");
             return Unauthorized(new { message = "Ungültige Anmeldedaten" });
         }
 
@@ -35,7 +45,7 @@ public class AuthController : ControllerBase
 
         return Ok(new { token, role = user.Role });
     }
-    
+
     [HttpPost("logout")]
     public IActionResult Logout()
     {
@@ -66,6 +76,35 @@ public static class TokenService
         return tokenHandler.WriteToken(token);
     }
 }
+
+public static class RateLimiter
+{
+    private static ConcurrentDictionary<string, (int attempts, DateTime lastAttempt)> loginAttempts =
+        new ConcurrentDictionary<string, (int, DateTime)>();
+
+    public static bool IsBlocked(string ip)
+    {
+        if (loginAttempts.TryGetValue(ip, out var attempt))
+        {
+            if (attempt.attempts >= 5 && (DateTime.UtcNow - attempt.lastAttempt).TotalMinutes < 15)
+                return true;
+        }
+        return false;
+    }
+
+    public static void RegisterAttempt(string ip, bool success)
+    {
+        if (success)
+        {
+            loginAttempts.TryRemove(ip, out _);
+        }
+        else
+        {
+            loginAttempts.AddOrUpdate(ip, (1, DateTime.UtcNow), (key, old) => (old.attempts + 1, DateTime.UtcNow));
+        }
+    }
+}
+
 
 public class LoginRequest
 {

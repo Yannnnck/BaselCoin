@@ -3,6 +3,13 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
 
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
+    let captchaInput = document.getElementById("captchaInput").value;
+
+    if (captchaInput.toUpperCase() !== captchaText) {
+        document.getElementById("errorMessage").innerText = "Captcha falsch!";
+        generateCaptcha();
+        return;
+    }
 
     let response = await fetch("http://localhost:5000/api/auth/login", {
         method: "POST",
@@ -19,6 +26,7 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
         document.getElementById("errorMessage").innerText = data.message;
     }
 });
+
 
 function logout() {
     let token = localStorage.getItem("token");
