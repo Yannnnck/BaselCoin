@@ -11,6 +11,12 @@ const translations = {
         password: "Password",
         error: "Invalid login credentials"
     },
+    fr: {
+        login: "Connexion",
+        username: "Nom d'utilisateur",
+        password: "Mot de passe",
+        error: "Identifiants invalides"
+    },
     it: {
         login: "Accesso",
         username: "Nome utente",
