@@ -1,0 +1,78 @@
+/* 🎨 Allgemeines Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* 🎨 Login-Container */
+.container {
+    background: white;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+/* 🎨 Benutzerliste im Admin-Dashboard */
+#userList li {
+    list-style: none;
+    background: #fff;
+    margin: 5px;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 🎨 Flaggen für Sprachauswahl */
+#languageSelector {
+    margin-top: 10px;
+}
+
+#languageSelector img {
+    width: 30px;
+    cursor: pointer;
+    margin: 5px;
+    transition: transform 0.2s;
+}
+
+#languageSelector img:hover {
+    transform: scale(1.2);
+}
+
+/* ✨ Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
