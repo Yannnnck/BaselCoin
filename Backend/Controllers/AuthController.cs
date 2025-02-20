@@ -111,3 +111,29 @@ public class LoginRequest
     public string Username { get; set; }
     public string Password { get; set; }
 }
+
+[HttpPost("register")]
+public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+{
+    var existingUser = await _users.Find(u => u.Username == request.Username).FirstOrDefaultAsync();
+    if (existingUser != null)
+        return BadRequest(new { message = "Benutzername bereits vergeben" });
+
+    var newUser = new User
+    {
+        Username = request.Username,
+        HashedPassword = PasswordHelper.HashPassword(request.Password),
+        Role = "User"
+    };
+
+    await _users.InsertOneAsync(newUser);
+    Logger.Log(request.Username, "Neuer Benutzer registriert");
+
+    return Ok(new { message = "Registrierung erfolgreich!" });
+}
+
+public class RegisterRequest
+{
+    public string Username { get; set; }
+    public string Password { get; set; }
+}

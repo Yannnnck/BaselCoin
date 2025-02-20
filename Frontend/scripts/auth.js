@@ -51,3 +51,22 @@ function logout() {
     window.location.href = "index.html";
 }
 
+document.getElementById("registerForm")?.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    let username = document.getElementById("regUsername").value;
+    let password = document.getElementById("regPassword").value;
+
+    let response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+    });
+
+    let data = await response.json();
+    document.getElementById("registerMessage").innerText = data.message;
+
+    if (response.ok) {
+        setTimeout(() => window.location.href = "index.html", 2000);
+    }
+});

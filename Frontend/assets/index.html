@@ -1,24 +1,38 @@
+<!-- Verbesserte index.html (Login-Seite) -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login - BaselCoin</title>
+    <link rel="stylesheet" href="../pages/styles.css">
+    <script src="../scripts/auth.js" defer></script>
+    <script src="../scripts/lang.js" defer></script>
+    <script src="../scripts/captcha.js" defer></script>
 </head>
 <body>
-    <form id="loginForm">
-        <input type="text" id="username" placeholder="Benutzername">
-        <input type="password" id="password" placeholder="Passwort">
-        <div id="captchaContainer"></div> <!-- Captcha wird hier gerendert -->
-        <button type="submit" id="loginButton">Anmelden</button>
-    </form>
-    
-    <div id="languageSelector">
-        <img src="pages/flags/germanflag.png" onclick="setLanguage('de')">
-        <img src="pages/flags/ukflag.png" onclick="setLanguage('en')">
-        <img src="pages/flags/italyflag.png" onclick="setLanguage('it')">
-        <img src="pages/flags/worstcountryflag.png" onclick="setLanguage('fr')">
+    <div class="container">
+        <h2>BaselCoin Login</h2>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Benutzername" required>
+            <input type="password" id="password" placeholder="Passwort" required>
+        
+            <div class="captcha-container">
+                <canvas id="captchaCanvas"></canvas>
+                <button type="button" onclick="generateCaptcha()">🔄</button>
+            </div>
+            <input type="text" id="captchaInput" placeholder="Captcha eingeben" required>
+        
+            <button type="submit" id="loginButton">Anmelden</button>
+        </form>
+        <p>Kein Konto? <a href="register.html">Hier registrieren</a></p>
+        <p id="errorMessage"></p>
     </div>
-    <p id="errorMessage" style="color: red;"></p>
+    <div id="languageSelector">
+        <img src="../pages/flags/germanflag.png" onclick="setLanguage('de')">
+        <img src="../pages/flags/ukflag.png" onclick="setLanguage('en')">
+        <img src="../pages/flags/italyflag.png" onclick="setLanguage('it')">
+        <img src="../pages/flags/worstcountryflag.png" onclick="setLanguage('fr')">
+    </div>
 </body>
 </html>
