@@ -3,11 +3,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
-using System.Threading.Tasks;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 [Route("api/auth")]
 [ApiController]
@@ -21,11 +21,13 @@ public class AuthController : ControllerBase
         _users = database.GetCollection<User>("Users");
     }
 
+    // 📌 LOGIN
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         string ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
+        // Brute-Force-Schutz: Wenn zu viele Versuche, blockieren
         if (RateLimiter.IsBlocked(ip))
             return StatusCode(429, new { message = "Zu viele fehlgeschlagene Versuche. Bitte in 15 Minuten erneut versuchen." });
 
@@ -40,12 +42,41 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Ungültige Anmeldedaten" });
         }
 
+        // Token generieren & zurückgeben
         string token = TokenService.GenerateJwtToken(user.Username, user.Role);
         Logger.Log(user.Username, "Erfolgreich eingeloggt");
 
         return Ok(new { token, role = user.Role });
     }
 
+    // 📌 REGISTRIERUNG
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+    {
+        // Passwortvalidierung
+        if (!PasswordHelper.IsValidPassword(request.Password))
+            return BadRequest(new { message = "Passwort muss zwischen 15-64 Zeichen haben, eine Zahl, einen Groß- & Kleinbuchstaben sowie ein Sonderzeichen enthalten." });
+
+        // Prüfen, ob Benutzername bereits existiert
+        var existingUser = await _users.Find(u => u.Username == request.Username).FirstOrDefaultAsync();
+        if (existingUser != null)
+            return BadRequest(new { message = "Benutzername bereits vergeben." });
+
+        // Neuen Benutzer mit gehashtem Passwort anlegen
+        var newUser = new User
+        {
+            Username = request.Username,
+            HashedPassword = PasswordHelper.HashPassword(request.Password),
+            Role = "User"
+        };
+
+        await _users.InsertOneAsync(newUser);
+        Logger.Log(request.Username, "Neuer Benutzer registriert");
+
+        return Ok(new { message = "Registrierung erfolgreich!" });
+    }
+
+    // 📌 LOGOUT
     [HttpPost("logout")]
     public IActionResult Logout()
     {
@@ -54,9 +85,11 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Logout erfolgreich" });
     }
 }
+
+// 📌 JWT TOKEN SERVICE (Token-Erstellung)
 public static class TokenService
 {
-    private static readonly string SecretKey = "DeinGeheimerSchluessel123456"; // Sicher aufbewahren!
+    private static readonly string SecretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "FallbackSchluessel";
 
     public static string GenerateJwtToken(string username, string role)
     {
@@ -69,7 +102,7 @@ public static class TokenService
                 new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.Role, role)
             }),
-            Expires = DateTime.UtcNow.AddMinutes(30), // Absolutes Timeout
+            Expires = DateTime.UtcNow.AddMinutes(30), // Token läuft nach 30 Minuten ab
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
         var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -77,6 +110,7 @@ public static class TokenService
     }
 }
 
+// 📌 RATE LIMITER (Schutz vor Brute-Force-Angriffen)
 public static class RateLimiter
 {
     private static ConcurrentDictionary<string, (int attempts, DateTime lastAttempt)> loginAttempts =
@@ -105,31 +139,11 @@ public static class RateLimiter
     }
 }
 
-
+// 📌 MODEL KLASSEN
 public class LoginRequest
 {
     public string Username { get; set; }
     public string Password { get; set; }
-}
-
-[HttpPost("register")]
-public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-{
-    var existingUser = await _users.Find(u => u.Username == request.Username).FirstOrDefaultAsync();
-    if (existingUser != null)
-        return BadRequest(new { message = "Benutzername bereits vergeben" });
-
-    var newUser = new User
-    {
-        Username = request.Username,
-        HashedPassword = PasswordHelper.HashPassword(request.Password),
-        Role = "User"
-    };
-
-    await _users.InsertOneAsync(newUser);
-    Logger.Log(request.Username, "Neuer Benutzer registriert");
-
-    return Ok(new { message = "Registrierung erfolgreich!" });
 }
 
 public class RegisterRequest

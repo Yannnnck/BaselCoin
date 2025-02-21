@@ -1,4 +1,3 @@
-<!-- Verbesserte dashboard.html (Benutzer-Dashboard) -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -7,12 +6,83 @@
     <title>Dashboard - BaselCoin</title>
     <link rel="stylesheet" href="../pages/styles.css">
     <script src="../scripts/session.js" defer></script>
+    <script src="../scripts/dashboard.js" defer></script>
 </head>
 <body>
+    <!-- 📌 Navigationsleiste für bessere Benutzerführung -->
+    <nav>
+        <a href="dashboard.html" class="active">Dashboard</a>
+        <a href="admin.html" id="adminLink" style="display: none;">Admin-Bereich</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </nav>
+
     <div class="container">
         <h2>Willkommen im BaselCoin Dashboard</h2>
         <p>Hier kannst du deine Kontodaten einsehen und verwalten.</p>
+
+        <!-- 📌 Benutzerinfos -->
+        <div class="user-info">
+            <p><strong>Benutzername:</strong> <span id="username">Lade...</span></p>
+            <p><strong>Rolle:</strong> <span id="role">Lade...</span></p>
+        </div>
+
+        <!-- 📌 Kontostand-Anzeige -->
+        <div class="balance-container">
+            <h3>Dein Kontostand</h3>
+            <p id="balance">Lade...</p>
+        </div>
+
+        <!-- 📌 Letzte Transaktionen -->
+        <div class="transactions">
+            <h3>Letzte Transaktionen</h3>
+            <ul id="transactionList">
+                <li>Lade Transaktionen...</li>
+            </ul>
+        </div>
+
         <button onclick="logout()">Logout</button>
     </div>
+
+    <script>
+        // 📌 Dynamisch Benutzerdaten laden
+        document.addEventListener("DOMContentLoaded", async () => {
+            let token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            let response = await fetch("http://localhost:5000/api/user/me", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                let data = await response.json();
+                document.getElementById("username").innerText = data.username;
+                document.getElementById("role").innerText = data.role;
+
+                // Falls Admin, Admin-Link anzeigen
+                if (data.role === "Admin") {
+                    document.getElementById("adminLink").style.display = "inline";
+                }
+
+                // Kontostand & Transaktionen abrufen
+                document.getElementById("balance").innerText = data.balance + " BaselCoins";
+                let transactions = data.transactions || [];
+                let transactionList = document.getElementById("transactionList");
+                transactionList.innerHTML = transactions.length > 0 
+                    ? transactions.map(t => `<li>${t.date}: ${t.amount} BaselCoins</li>`).join("")
+                    : "<li>Keine Transaktionen</li>";
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        // 📌 Logout-Funktion
+        function logout() {
+            localStorage.removeItem("token");
+            window.location.href = "index.html";
+        }
+    </script>
 </body>
 </html>

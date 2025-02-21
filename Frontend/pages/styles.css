@@ -10,16 +10,19 @@ body {
     height: 100vh;
 }
 
-/* 🎨 Login-Container */
+/* 🎨 Login & Registrierung - Container */
 .container {
     background: white;
     padding: 20px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     text-align: center;
     animation: fadeIn 0.8s ease-in-out;
+    width: 90%;
+    max-width: 400px;
 }
 
+/* 🎨 Eingabefelder */
 input {
     display: block;
     width: 100%;
@@ -27,32 +30,102 @@ input {
     margin: 10px 0;
     border: 1px solid #ccc;
     border-radius: 5px;
+    font-size: 16px;
 }
 
-button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
+/* 🎨 Passwort-Sichtbarkeitsumschaltung */
+.password-container {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 35%;
+    background: none;
     border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* 🎨 Buttons */
+button {
+    background: linear-gradient(90deg, #007bff, #00c3ff);
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 12px;
     border-radius: 5px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: all 0.3s;
+    width: 100%;
 }
 
 button:hover {
     transform: scale(1.05);
+    background: linear-gradient(90deg, #00c3ff, #007bff);
 }
 
-/* 🎨 Benutzerliste im Admin-Dashboard */
-#userList li {
-    list-style: none;
-    background: #fff;
-    margin: 5px;
+/* 🎨 Navigationsleiste */
+nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #007bff;
     padding: 10px;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    padding: 10px;
+    display: inline-block;
+    transition: 0.3s;
+}
+
+nav a:hover, nav a.active {
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+}
+
+/* 🎨 Admin-Dashboard */
+.user-management, .user-list {
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 🎨 Benutzerliste als Tabelle */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+}
+
+/* 🎨 Kontostand-Anzeige */
+.balance-container {
+    background: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
 }
 
 /* 🎨 Flaggen für Sprachauswahl */
@@ -75,4 +148,20 @@ button:hover {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* 📌 Responsives Design */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    nav a {
+        font-size: 14px;
+        padding: 8px;
+    }
 }

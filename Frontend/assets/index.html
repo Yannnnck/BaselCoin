@@ -1,4 +1,3 @@
-<!-- Verbesserte index.html (Login-Seite) -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -11,28 +10,51 @@
     <script src="../scripts/captcha.js" defer></script>
 </head>
 <body>
+    <!-- 📌 Navigationsleiste für bessere Benutzerführung -->
+    <nav>
+        <a href="index.html" class="active">Login</a>
+        <a href="register.html">Registrieren</a>
+        <!-- 📌 Sprachumschaltung -->
+        <div id="languageSelector">
+            <img src="../pages/flags/germanflag.png" onclick="setLanguage('de')">
+            <img src="../pages/flags/ukflag.png" onclick="setLanguage('en')">
+            <img src="../pages/flags/italyflag.png" onclick="setLanguage('it')">
+            <img src="../pages/flags/worstcountryflag.png" onclick="setLanguage('fr')">
+        </div>
+    </nav>
+
     <div class="container">
         <h2>BaselCoin Login</h2>
         <form id="loginForm">
+            <!-- 📌 Benutzername -->
             <input type="text" id="username" placeholder="Benutzername" required>
-            <input type="password" id="password" placeholder="Passwort" required>
-        
+
+            <!-- 📌 Passwort mit Sichtbarkeitsumschaltung -->
+            <div class="password-container">
+                <input type="password" id="password" placeholder="Passwort" required>
+                <button type="button" class="toggle-password" onclick="togglePassword()">👁</button>
+            </div>
+
+            <!-- 📌 Captcha -->
             <div class="captcha-container">
                 <canvas id="captchaCanvas"></canvas>
                 <button type="button" onclick="generateCaptcha()">🔄</button>
             </div>
             <input type="text" id="captchaInput" placeholder="Captcha eingeben" required>
-        
+
             <button type="submit" id="loginButton">Anmelden</button>
         </form>
+
         <p>Kein Konto? <a href="register.html">Hier registrieren</a></p>
-        <p id="errorMessage"></p>
+        <p id="errorMessage" class="error-message"></p>
     </div>
-    <div id="languageSelector">
-        <img src="../pages/flags/germanflag.png" onclick="setLanguage('de')">
-        <img src="../pages/flags/ukflag.png" onclick="setLanguage('en')">
-        <img src="../pages/flags/italyflag.png" onclick="setLanguage('it')">
-        <img src="../pages/flags/worstcountryflag.png" onclick="setLanguage('fr')">
-    </div>
+
+    <script>
+        // 📌 Passwort-Sichtbarkeit umschalten
+        function togglePassword() {
+            let passwordField = document.getElementById("password");
+            passwordField.type = passwordField.type === "password" ? "text" : "password";
+        }
+    </script>
 </body>
 </html>

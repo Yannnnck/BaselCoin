@@ -1,23 +1,54 @@
-<!-- Verbesserte register.html (Registrierungsseite) -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrierung - BaselCoin</title>
-    <link rel="stylesheet" href="pages/styles.css">
-    <script src="scripts/auth.js" defer></script>
+    <link rel="stylesheet" href="../pages/styles.css">
+    <script src="../scripts/auth.js" defer></script>
 </head>
 <body>
+    <!-- 📌 Navigationsleiste für bessere Benutzerführung -->
+    <nav>
+        <a href="index.html">Login</a>
+        <a href="register.html" class="active">Registrieren</a>
+        <!-- 📌 Sprachumschaltung -->
+        <div id="languageSelector">
+            <img src="../pages/flags/germanflag.png" onclick="setLanguage('de')">
+            <img src="../pages/flags/ukflag.png" onclick="setLanguage('en')">
+            <img src="../pages/flags/italyflag.png" onclick="setLanguage('it')">
+            <img src="../pages/flags/worstcountryflag.png" onclick="setLanguage('fr')">
+        </div>
+    </nav>
+
     <div class="container">
         <h2>BaselCoin Registrierung</h2>
         <form id="registerForm">
+            <!-- 📌 Benutzername -->
             <input type="text" id="regUsername" placeholder="Benutzername" required>
-            <input type="password" id="regPassword" placeholder="Passwort" required>
+
+            <!-- 📌 E-Mail-Adresse (optional, für spätere Funktionen) -->
+            <input type="email" id="regEmail" placeholder="E-Mail (optional)">
+
+            <!-- 📌 Passwort mit Sichtbarkeitsumschaltung -->
+            <div class="password-container">
+                <input type="password" id="regPassword" placeholder="Passwort" required>
+                <button type="button" class="toggle-password" onclick="togglePassword()">👁</button>
+            </div>
+
             <button type="submit">Registrieren</button>
         </form>
-        <p id="registerMessage"></p>
+
+        <p id="registerMessage" class="error-message"></p>
         <a href="index.html">Zurück zum Login</a>
     </div>
+
+    <script>
+        // 📌 Passwort-Sichtbarkeit umschalten
+        function togglePassword() {
+            let passwordField = document.getElementById("regPassword");
+            passwordField.type = passwordField.type === "password" ? "text" : "password";
+        }
+    </script>
 </body>
 </html>
